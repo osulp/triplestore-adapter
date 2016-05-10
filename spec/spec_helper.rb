@@ -11,4 +11,4 @@ SimpleCov.start
 require 'pry'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'rdf/vocab'
-require 'TriplestoreAdapter'
+require 'triplestore_adapter'

@@ -1,32 +1,39 @@
 require 'net/http'
 
 rails_env = ENV['RAILS_ENV'] || 'test'
-BLAZEGRAPH_HOME = ENV['BLAZEGRAPH_HOME'] || File.expand_path('./blazegraph')
+root_path = File.expand_path("../../", __FILE__)
+app_root_path = root_path
+app_root_path = Rails.root if defined?(Rails)
+tmp_path = File.join(app_root_path, "/tmp")
+log_path = File.join(app_root_path, "/log")
+
+
+BLAZEGRAPH_HOME = ENV['BLAZEGRAPH_HOME'] || File.join(app_root_path, '/blazegraph')
+BLAZEGRAPH_CONFIG_LOG4J = ENV['BLAZEGRAPH_CONFIG_LOG4J'] || File.join(app_root_path, "/config/triplestore_adapter/blazegraph/log4j.properties")
+BLAZEGRAPH_CONFIG_DEFAULT = ENV['BLAZEGRAPH_CONFIG_DEFAULT'] || File.join(app_root_path, "/config/triplestore_adapter/blazegraph/blazegraph.properties")
+
 BLAZEGRAPH_DOWNLOAD_URL = ENV['BLAZEGRAPH_DOWNLOAD'] || "http://iweb.dl.sourceforge.net/project/bigdata/bigdata/2.1.0/blazegraph.jar"
 BLAZEGRAPH_URL = ENV['BLAZEGRAPH_URL'] || 'http://localhost:9999/blazegraph'
 BLAZEGRAPH_SPARQL = "#{BLAZEGRAPH_URL}/namespace/#{rails_env}/sparql"
-BLAZEGRAPH_CONFIG_LOG4J = ENV['BLAZEGRAPH_CONFIG_LOG4J'] || "./lib/config/blazegraph/log4j.properties"
-BLAZEGRAPH_CONFIG_DEFAULT = ENV['BLAZEGRAPH_CONFIG_DEFAULT'] || "./lib/config/blazegraph/blazegraph.properties"
 
 namespace :triplestore_adapter do
   namespace :blazegraph do
     desc "Delete journal, download, and restart Blazegraph"
     task :reset do
+      Rake::Task['triplestore_adapter:blazegraph:setup'].invoke
+      sleep(2)
       Rake::Task['triplestore_adapter:blazegraph:clean'].invoke
       Rake::Task['triplestore_adapter:blazegraph:download'].invoke
       Rake::Task['triplestore_adapter:blazegraph:start'].invoke
       puts "Waiting for Blazegraph server to settle"
       sleep(5)
       Rake::Task['triplestore_adapter:blazegraph:build_namespace'].invoke
-      puts "\n\n\nBlazegraph should be ready to roll."
+      puts "\n\n\nYay! Blazegraph should be ready to roll."
     end
 
     desc "Download Blazegraph if necessary"
     task :download do
-      tmp_dir = File.expand_path('./tmp')
-      Dir.mkdir(tmp_dir) unless File.exists?(tmp_dir)
-
-      cached_jar = File.expand_path("#{tmp_dir}/blazegraph.jar")
+      cached_jar = File.join(tmp_path, "blazegraph.jar")
       if File.exist?(cached_jar)
         puts "#{cached_jar} exists, skipping download."
       else
@@ -72,6 +79,31 @@ namespace :triplestore_adapter do
     task :post_rdf do
       post = spawn "curl -v -X POST --data-binary @#{File.expand_path(ENV['file'])} --header 'Content-Type:application/ld+json' #{BLAZEGRAPH_SPARQL}"
       Process.wait post
+    end
+
+    desc "Setup directories and configurations"
+    task :setup do
+      Dir.mkdir(log_path) unless File.exists?(log_path)
+      Dir.mkdir(BLAZEGRAPH_HOME) unless File.exists?(BLAZEGRAPH_HOME)
+      Dir.mkdir(tmp_path) unless File.exists?(tmp_path)
+
+      src_configs = File.join(root_path, "/config/blazegraph")
+      app_configs = File.join(app_root_path, "/config/triplestore_adapter/blazegraph")
+      puts "Copying src configs (#{src_configs}) to app configs (#{app_configs})"
+
+      # Create the directory structure if it doesn't exist
+      FileUtils.mkdir_p(app_configs)
+
+      # Copy files from the gem source configs to the Rails app configs
+      Dir["#{src_configs}/*"].each do |src|
+        dest_config = File.join(app_configs, File.basename(src))
+        if File.exists?(dest_config)
+          puts "Skipping copy, #{dest_config} exists."
+        else
+          puts "#{src} copied to #{app_configs}."
+          FileUtils.cp(src, app_configs)
+        end
+      end
     end
   end
 end

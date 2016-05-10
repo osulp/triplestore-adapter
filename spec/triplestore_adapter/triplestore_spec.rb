@@ -69,6 +69,7 @@ describe TriplestoreAdapter::Triplestore do
       expect { subject.store(graph) }.to raise_exception(TriplestoreAdapter::TriplestoreException)
     end
     it "should raise an exception when trying to delete" do
+      allow(subject).to receive(:fetch_cached_graph).with(rdf_url).and_raise("boo")
       expect { subject.delete(rdf_url) }.to raise_exception(TriplestoreAdapter::TriplestoreException)
     end
     describe "and malfunctioning triplestore" do

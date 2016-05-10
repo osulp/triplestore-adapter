@@ -16,6 +16,11 @@ Or install it yourself as:
 
     $ gem install TriplestoreAdapter
 
+Add this line to your config/application.rb
+``` ruby
+require 'triplestore_adapter'
+```
+
 ## Usage
 
 TODO: Write usage instructions here
