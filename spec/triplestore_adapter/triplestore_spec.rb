@@ -39,6 +39,9 @@ describe TriplestoreAdapter::Triplestore do
     it "should delete the graph" do
       expect(subject.delete(rdf_url)).to be_truthy
     end
+    it "should delete all statements" do
+      expect(subject.delete_all_statements).to be_truthy
+    end
     it "should return a cached graph" do
       g = subject.send(:fetch_and_cache_graph, rdf_url)
       expect(g).to be_an_instance_of(RDF::Graph)
@@ -71,6 +74,10 @@ describe TriplestoreAdapter::Triplestore do
     it "should raise an exception when trying to delete" do
       allow(subject).to receive(:fetch_cached_graph).with(rdf_url).and_raise("boo")
       expect { subject.delete(rdf_url) }.to raise_exception(TriplestoreAdapter::TriplestoreException)
+    end
+    it "should raise an exception when trying to delete_all_statements" do
+      allow(subject.client).to receive(:clear_statements).and_raise("boo")
+      expect { subject.delete_all_statements }.to raise_exception(TriplestoreAdapter::TriplestoreException)
     end
     describe "and malfunctioning triplestore" do
       before do

@@ -27,5 +27,20 @@ module TriplestoreAdapter
       raise TriplestoreAdapter::TriplestoreException.new("#{@provider.class.name} missing get_statements method.") unless @provider.respond_to?(:get_statements)
       @provider.get_statements(subject: subject)
     end
+
+    def clear_statements
+      raise TriplestoreAdapter::TriplestoreException.new("#{@provider.class.name} missing clear_statements method.") unless @provider.respond_to?(:clear_statements)
+      @provider.clear_statements
+    end
+
+    def build_namespace(namespace)
+      raise TriplestoreAdapter::TriplestoreException.new("#{@provider.class.name} missing build_namespace method.") unless @provider.respond_to?(:build_namespace)
+      @provider.build_namespace(namespace)
+    end
+
+    def delete_namespace(namespace)
+      raise TriplestoreAdapter::TriplestoreException.new("#{@provider.class.name} missing delete_namespace method.") unless @provider.respond_to?(:delete_namespace)
+      @provider.delete_namespace(namespace)
+    end
   end
 end

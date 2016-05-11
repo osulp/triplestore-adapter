@@ -60,6 +60,18 @@ module TriplestoreAdapter
       end
     end
 
+    ##
+    # Delete all graphs from the triplestore cache
+    #
+    # @return [Boolean]
+    def delete_all_statements
+      begin
+        @client.clear_statements
+        return true
+      rescue => e
+        raise TriplestoreAdapter::TriplestoreException, "delete_all_statements from triplestore cache failed with exception: #{e.message}"
+      end
+    end
     private
 
     ##
