@@ -65,14 +65,6 @@ describe TriplestoreAdapter::Client do
         allow(client.provider).to receive(:clear_statements).and_return(true)
         expect(client.clear_statements()).not_to be_nil
       end
-      it 'returns provider.build_namespace' do
-        allow(client.provider).to receive(:build_namespace).with('test').and_return(true)
-        expect(client.build_namespace('test')).not_to be_nil
-      end
-      it 'returns provider.delete_namespace' do
-        allow(client.provider).to receive(:delete_namespace).with('test').and_return(true)
-        expect(client.delete_namespace('test')).not_to be_nil
-      end
     end
   end
 end

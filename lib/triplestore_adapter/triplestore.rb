@@ -82,7 +82,7 @@ module TriplestoreAdapter
     # @return [RDF::Graph] if the graph is found in the cache
     # @return [nil] if the graph was not in the cache
     def fetch_cached_graph(rdf_url)
-      statements = @client.get_statements(subject: RDF::URI(rdf_url))
+      statements = @client.get_statements(subject: rdf_url)
       if statements.count == 0
         puts "[INFO] fetch_cached_graph(#{rdf_url}) not found in triplestore cache (#{@client.url})"
         return nil
