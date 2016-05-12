@@ -1,6 +1,7 @@
 require 'rdf/blazegraph'
 require 'sparql/client'
 require 'rdf'
+require 'json/ld'
 require 'uri'
 
 module TriplestoreAdapter::Providers
@@ -18,12 +19,18 @@ module TriplestoreAdapter::Providers
     end
 
     ##
-    # Insert the provided statements into the triplestore
+    # Insert the provided statements into the triplestore, JSONLD allows for
+    # UTF8 charset.
     # @param [RDF::Enumerable] statements to insert into triplestore
     # @return [Boolean] true if the insert was successful
     def insert(statements)
       raise(TriplestoreAdapter::TriplestoreException, "insert received an invalid array of statements") unless statements.any?
-      @client.insert(statements)
+
+      writer = RDF::Writer.for(:jsonld)
+      request = Net::HTTP::Post.new(@uri)
+      request['Content-Type'] = 'application/ld+json'
+      request.body = writer.dump(statements)
+      @http.request(@uri, request)
       return true
     end
 

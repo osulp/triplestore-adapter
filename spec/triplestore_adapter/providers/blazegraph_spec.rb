@@ -44,4 +44,40 @@ describe TriplestoreAdapter::Providers::Blazegraph do
       expect(graph.has_statement?(s)).to be_falsey
     end
   end
+
+  context 'with statements having UTF-8 chars' do
+    # statements includes UTF-8 subject/label
+    let(:statements) do
+      [
+        RDF::Statement(RDF::URI('http://blah.blah.blah/blah�'), RDF::Vocab::DC.title, "Blah�"),
+        RDF::Statement(RDF::URI('http://blah.blah.blah/blah�'), RDF::Vocab::DC.relation, "Related to Blarg")
+      ]
+    end
+
+    it 'inserts statements' do
+      expect(subject.insert(statements)).to be_truthy
+    end
+
+    it 'deletes statements' do
+      expect(subject.delete(statements)).to be_truthy
+    end
+
+    it 'gets statements' do
+      subject.insert(statements)
+      result = subject.get_statements(subject: statements.first.subject.to_s)
+      graph = RDF::Graph.new << result
+      statements.each do |s|
+        expect(graph.has_statement?(s)).to be_truthy
+      end
+    end
+
+    it 'clear statements' do
+      expect(subject.clear_statements).to be_truthy
+      result = subject.get_statements(subject: statements.first.subject.to_s)
+      graph = RDF::Graph.new << result
+      statements.each do |s|
+        expect(graph.has_statement?(s)).to be_falsey
+      end
+    end
+  end
 end
