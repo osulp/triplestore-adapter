@@ -67,7 +67,7 @@ module TriplestoreAdapter::Providers
     # @param [String] namespace to be built
     # @return [String] URI for the new namespace
     def build_namespace(namespace)
-      raise(TriplestoreAdapter::TriplestoreException, "build_namespace received blank namepsace") if namespace.empty?
+      raise(TriplestoreAdapter::TriplestoreException, "build_namespace received blank namespace") if namespace.empty?
       request = Net::HTTP::Post.new("#{build_url}/blazegraph/namespace")
       request['Content-Type'] = 'text/plain'
       request.body = "com.bigdata.rdf.sail.namespace=#{namespace}"
@@ -80,8 +80,8 @@ module TriplestoreAdapter::Providers
     # @param [String] namespace to be deleted
     # @return [Boolean] true if the namespace was deleted
     def delete_namespace(namespace)
-      raise(TriplestoreAdapter::TriplestoreException, "delete_namespace received blank namepsace") if namespace.empty?
-      request = Net::HTTP::Delete.new("#{build_url}/blazegraph/namespace/#{namespace}}")
+      raise(TriplestoreAdapter::TriplestoreException, "delete_namespace received blank namespace") if namespace.empty?
+      request = Net::HTTP::Delete.new("#{build_url}/blazegraph/namespace/#{namespace}")
       @http.request(@uri, request)
       return true
     end
