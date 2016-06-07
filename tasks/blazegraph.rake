@@ -12,7 +12,7 @@ BLAZEGRAPH_HOME = ENV['BLAZEGRAPH_HOME'] || File.join(app_root_path, '/blazegrap
 BLAZEGRAPH_CONFIG_LOG4J = ENV['BLAZEGRAPH_CONFIG_LOG4J'] || File.join(app_root_path, "/config/triplestore_adapter/blazegraph/log4j.properties")
 BLAZEGRAPH_CONFIG_DEFAULT = ENV['BLAZEGRAPH_CONFIG_DEFAULT'] || File.join(app_root_path, "/config/triplestore_adapter/blazegraph/blazegraph.properties")
 
-BLAZEGRAPH_DOWNLOAD_URL = ENV['BLAZEGRAPH_DOWNLOAD'] || "http://iweb.dl.sourceforge.net/project/bigdata/bigdata/2.1.0/blazegraph.jar"
+BLAZEGRAPH_DOWNLOAD_URL = ENV['BLAZEGRAPH_DOWNLOAD'] || "https://sourceforge.net/projects/bigdata/files/latest/download"
 BLAZEGRAPH_URL = ENV['BLAZEGRAPH_URL'] || 'http://localhost:9999/blazegraph'
 BLAZEGRAPH_SPARQL = "#{BLAZEGRAPH_URL}/namespace/#{rails_env}/sparql"
 
@@ -39,10 +39,9 @@ namespace :triplestore_adapter do
       else
         uri = URI(BLAZEGRAPH_DOWNLOAD_URL)
         puts "Downloading Blazegraph from #{uri}, please wait."
-        jar = Net::HTTP.get(uri)
-        File.open(cached_jar, "wb") do |f|
-          f.write(jar)
-        end
+        # wget properly handles redirects for an appropriate mirror
+        dl = spawn "cd #{tmp_path} && wget #{uri} -O #{cached_jar}"
+        Process.wait dl
       end
       puts "Copying #{cached_jar} to #{BLAZEGRAPH_HOME}/blazegraph.jar."
       cp = spawn "cp #{cached_jar} #{BLAZEGRAPH_HOME}/blazegraph.jar"
