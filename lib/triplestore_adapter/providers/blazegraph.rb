@@ -40,7 +40,14 @@ module TriplestoreAdapter::Providers
     # @return [Boolean] true if the delete was successful
     def delete(statements)
       raise(TriplestoreAdapter::TriplestoreException, "delete received invalid array of statements") unless statements.any?
-      @client.delete(statements)
+
+      #TODO: Evaluate that all statements are singular, and without bnodes?
+      writer = RDF::Writer.for(:jsonld)
+      uri = URI.parse("#{@uri}?delete")
+      request = Net::HTTP::Post.new(uri)
+      request['Content-Type'] = 'application/ld+json'
+      request.body = writer.dump(statements)
+      @http.request(uri, request)
       return true
     end
 
