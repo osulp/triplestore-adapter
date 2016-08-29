@@ -29,7 +29,7 @@ describe TriplestoreAdapter::Triplestore do
 
   context "with a valid URI" do
     before :each do
-      subject.fetch(rdf_url)
+      subject.fetch(rdf_url, from_remote: true)
     end
     it "should return a graph" do
       graph = subject.fetch(rdf_url)
