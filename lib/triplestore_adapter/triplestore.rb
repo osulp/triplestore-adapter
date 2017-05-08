@@ -20,7 +20,7 @@ module TriplestoreAdapter
         graph = fetch_cached_graph(rdf_url)
 
         if graph.nil? && !from_remote
-          raise TriplestoreAdapter::TriplestoreException, "graph not found in cache, from_remote:#{from_remote.to_s}, skipping fetch from remote graph"
+          raise TriplestoreAdapter::TriplestoreException, "graph not found in cache. Skipping fetch from remote graph"
         elsif graph.nil?
           graph = fetch_and_cache_graph(rdf_url)
         end
