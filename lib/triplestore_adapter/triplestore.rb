@@ -1,3 +1,5 @@
+include 'rdf/rdfxml'
+
 module TriplestoreAdapter
   class Triplestore
 

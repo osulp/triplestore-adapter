@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency     "rdf-vocab"
   spec.add_runtime_dependency     "rdf"
   spec.add_runtime_dependency     "json-ld"
+  spec.add_runtime_dependency     "rdf-rdfxml"
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
