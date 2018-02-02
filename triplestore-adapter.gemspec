@@ -23,11 +23,12 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version      = '>= 2.2.2'
   spec.requirements               = []
 
-  spec.add_runtime_dependency     "rdf-blazegraph", "0.0.2"
-  spec.add_runtime_dependency     "sparql-client", "~> 1.99"
-  spec.add_runtime_dependency     "rdf-vocab", "~> 0.8"
-  spec.add_runtime_dependency     "rdf", "~> 1.99"
-  spec.add_runtime_dependency     "json-ld", "~> 1.99"
+  spec.add_runtime_dependency     "sparql-client"
+  spec.add_runtime_dependency     "rdf-vocab"
+  spec.add_runtime_dependency     "rdf"
+  spec.add_runtime_dependency     "json-ld"
+  spec.add_runtime_dependency     "rdf-rdfxml"
+  spec.add_runtime_dependency     "net-http-persistent", "~> 2.9"
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"

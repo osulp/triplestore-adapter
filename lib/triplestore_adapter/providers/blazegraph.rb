@@ -1,4 +1,3 @@
-require 'rdf/blazegraph'
 require 'sparql/client'
 require 'rdf'
 require 'json/ld'
@@ -6,7 +5,7 @@ require 'uri'
 
 module TriplestoreAdapter::Providers
   class Blazegraph
-    attr_reader :url, :client, :sparql_client
+    attr_reader :url, :sparql_client
 
     ##
     # @param [String] url of SPARQL endpoint
@@ -14,7 +13,6 @@ module TriplestoreAdapter::Providers
       @http = Net::HTTP::Persistent.new(self.class)
       @url = url
       @uri = URI.parse(@url.to_s)
-      @client = RDF::Blazegraph::RestClient.new(@uri)
       @sparql_client = SPARQL::Client.new(@uri)
     end
 
@@ -57,7 +55,11 @@ module TriplestoreAdapter::Providers
     # @return [RDF::Enumerable] RDF statements
     def get_statements(subject: nil)
       raise(TriplestoreAdapter::TriplestoreException, "get_statements received blank subject") if subject.empty?
-      @client.get_statements(subject: RDF::URI(subject))
+      subject = URI.escape(subject.to_s)
+      uri = URI.parse(format("%{uri}?GETSTMTS&s=<%{subject}>&includeInferred=false", {uri: @uri, subject: subject}))
+      request = Net::HTTP::Get.new(uri)
+      response = @http.request(uri, request)
+      RDF::Reader.for(:ntriples).new(response.body)
     end
 
     ##
@@ -65,7 +67,8 @@ module TriplestoreAdapter::Providers
     # specified in the @uri. *BE CAREFUL*
     # @return [Boolean] true if the triplestore was cleared
     def clear_statements
-      @client.clear_statements
+      request = Net::HTTP::Delete.new(@uri)
+      @http.request(@uri, request)
       return true
     end
 
