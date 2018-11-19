@@ -18,7 +18,6 @@ Gem::Specification.new do |spec|
   spec.platform      = Gem::Platform::RUBY
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|coverage|blazegraph/blazegraph)/}) }
   spec.require_paths = ["lib", "tasks", "blazegraph", "config"]
-  spec.has_rdoc      = false
 
   spec.required_ruby_version      = '>= 2.2.2'
   spec.requirements               = []
