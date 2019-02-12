@@ -61,6 +61,15 @@ module TriplestoreAdapter::Providers
       response = @http.request(uri, request)
       RDF::Reader.for(:ntriples).new(response.body)
     end
+    
+    # Returns all statements
+    # @return [RDF::Enumerable] RDF statements
+    def get_statements
+      uri = URI.parse(format("%{uri}?GETSTMTS&includeInferred=false", {uri: @uri}))
+      request = Net::HTTP::Get.new(uri)
+      response = @http.request(uri, request)
+      RDF::Reader.for(:ntriples).new(response.body)
+    end
 
     ##
     # Clear all statements from the triplestore contained in the namespace
