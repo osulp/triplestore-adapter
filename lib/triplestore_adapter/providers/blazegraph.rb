@@ -53,10 +53,19 @@ module TriplestoreAdapter::Providers
     # Returns statements matching the subject
     # @param [String] subject url
     # @return [RDF::Enumerable] RDF statements
-    def get_statements(subject: nil, predicate: nil, object: nil, 
-                       context: nil, include_inferred: false)
-      st_query = access_path_query(subject, predicate, object, context)
-      uri = URI.parse(format("%{uri}"?GETSTMTS#{st_query}&include_inferred=#{include_inferred}", {uri: @uri}))
+    def get_statements(subject: nil)
+      raise(TriplestoreAdapter::TriplestoreException, "get_statements received blank subject") if subject.empty?
+      subject = URI.escape(subject.to_s)
+      uri = URI.parse(format("%{uri}?GETSTMTS&s=<%{subject}>&includeInferred=false", {uri: @uri, subject: subject}))
+      request = Net::HTTP::Get.new(uri)
+      response = @http.request(uri, request)
+      RDF::Reader.for(:ntriples).new(response.body)
+    end
+    
+    # Returns all statements
+    # @return [RDF::Enumerable] RDF statements
+    def get_statements
+      uri = URI.parse(format("%{uri}?GETSTMTS&includeInferred=false", {uri: @uri}))
       request = Net::HTTP::Get.new(uri)
       response = @http.request(uri, request)
       RDF::Reader.for(:ntriples).new(response.body)
@@ -100,13 +109,6 @@ module TriplestoreAdapter::Providers
     def build_url
       port = ":#{@uri.port}" if @uri.port != 80
       "#{@uri.scheme}://#{@uri.host}#{port}"
-    end
-    
-    def access_path_query(subject, predicate, object, context)
-      str = {s: subject, p: predicate, o: object, c: context}.map do |k, v|
-        v ? "#{k}=#{v.to_base}" : nil
-      end.compact.join('&')
-      str.empty? ? str : "&#{str}" 
     end
   end
 end
