@@ -56,15 +56,20 @@ namespace :triplestore_adapter do
 
     desc "Kill existing process(es) and restart Blazegraph"
     task :start do
-      # finds existing blazegraph server processes and kills them in order to
-      # restart
-      killer = spawn "ps aux | grep blazegraph.jar | grep -server | awk '{print $2}' | xargs kill"
-      Process.wait killer
+      Rake::Task['triplestore_adapter:blazegraph:stop'].invoke
 
       puts "Starting Blazegraph server"
       pid = spawn "nohup java -server -Xmx4g -Dbigdata.propertyFile=#{File.expand_path(BLAZEGRAPH_CONFIG_DEFAULT)} -Dlog4j.configuration=file:#{File.expand_path(BLAZEGRAPH_CONFIG_LOG4J)} -jar #{BLAZEGRAPH_HOME}/blazegraph.jar > log/blazegraph.log 2>&1&"
       sleep(10)
       puts "Blazegraph started on PID #{pid}"
+    end
+    
+    desc "Kill existing process(es)"
+    task :stop do
+      # finds existing blazegraph server processes and kills them
+      puts "Stopping Blazegraph server"
+      killer = spawn "ps aux | grep blazegraph.jar | grep -server | awk '{print $2}' | xargs kill"
+      Process.wait killer
     end
 
     desc "Create (if needed) the rails_env Blazegraph namespace"
