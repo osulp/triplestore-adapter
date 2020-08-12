@@ -84,7 +84,6 @@ module TriplestoreAdapter
     ##
     # Fetch the graph from the triplestore cache
     #
-    # @private
     # @param [String] url
     # @return [RDF::Graph] if the graph is found in the cache
     # @return [nil] if the graph was not in the cache
