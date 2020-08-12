@@ -80,7 +80,6 @@ module TriplestoreAdapter
         raise TriplestoreAdapter::TriplestoreException, "delete_all_statements from triplestore cache failed with exception: #{e.message}"
       end
     end
-    private
 
     ##
     # Fetch the graph from the triplestore cache
@@ -97,7 +96,8 @@ module TriplestoreAdapter
       end
       RDF::Graph.new.insert(*statements)
     end
-
+    
+    private
     ##
     # Fetch the graph from the source URL, and cache it for future use
     #
