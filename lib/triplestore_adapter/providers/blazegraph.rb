@@ -10,7 +10,7 @@ module TriplestoreAdapter::Providers
     ##
     # @param [String] url of SPARQL endpoint
     def initialize(url)
-      @http = Net::HTTP::Persistent.new(self.class)
+      @http = Net::HTTP::Persistent.new
       @url = url
       @uri = URI.parse(@url.to_s)
       @sparql_client = SPARQL::Client.new(@uri)
@@ -57,8 +57,7 @@ module TriplestoreAdapter::Providers
       raise(TriplestoreAdapter::TriplestoreException, "get_statements received blank subject") if subject.empty?
       subject = URI.escape(subject.to_s)
       uri = URI.parse(format("%{uri}?GETSTMTS&s=<%{subject}>&includeInferred=false", {uri: @uri, subject: subject}))
-      request = Net::HTTP::Get.new(uri)
-      response = @http.request(uri, request)
+      response = @http.request uri
       RDF::Reader.for(:ntriples).new(response.body)
     end
 
