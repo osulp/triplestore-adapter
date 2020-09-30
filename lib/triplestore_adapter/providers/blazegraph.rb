@@ -10,7 +10,7 @@ module TriplestoreAdapter::Providers
     ##
     # @param [String] url of SPARQL endpoint
     def initialize(url)
-      @http = Net::HTTP::Persistent.new(self.class)
+      @http = Net::HTTP::Persistent.new
       @url = url
       @uri = URI.parse(@url.to_s)
       @sparql_client = SPARQL::Client.new(@uri)
