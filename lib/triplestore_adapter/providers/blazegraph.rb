@@ -2,6 +2,7 @@ require 'sparql/client'
 require 'rdf'
 require 'json/ld'
 require 'uri'
+require 'erb'
 
 module TriplestoreAdapter::Providers
   class Blazegraph
@@ -55,7 +56,7 @@ module TriplestoreAdapter::Providers
     # @return [RDF::Enumerable] RDF statements
     def get_statements(subject: nil)
       raise(TriplestoreAdapter::TriplestoreException, "get_statements received blank subject") if subject.empty?
-      subject = URI.escape(subject.to_s)
+      subject = ERB::Util.url_encode(subject.to_s)
       uri = URI.parse(format("%{uri}?GETSTMTS&s=<%{subject}>&includeInferred=false", {uri: @uri, subject: subject}))
       request = Net::HTTP::Get.new(uri)
       response = @http.request(uri, request)
